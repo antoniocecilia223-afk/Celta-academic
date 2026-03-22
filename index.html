@@ -2,96 +2,139 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Celta Academy | Hub Elite</title>
+    <title>Celta Academy | Sistema de Elite</title>
     <style>
-        :root { --dark: #080808; --card: #121212; --metal: linear-gradient(180deg, #e0e0e0 0%, #707070 100%); }
-        body { background-color: var(--dark); color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 100px; }
-        header { text-align: center; padding: 40px; border-bottom: 1px solid #222; }
-        header h1 { font-size: 3em; letter-spacing: 5px; background: var(--metal); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .grid-cursos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 40px; }
-        .celta-card { background: var(--card); border: 1px solid #222; padding: 25px; border-radius: 5px; position: relative; }
-        .vagas-badge { position: absolute; top: 10px; right: 10px; background: #c62828; font-size: 10px; padding: 5px; border-radius: 2px; }
-        .btn-celta { background: var(--metal); color: #000; border: none; width: 100%; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        :root { --dark: #050505; --card: #111; --gold: #ffd700; --metal: linear-gradient(180deg, #ccc, #666); }
+        body { background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; }
         
-        /* Seção de Candidatura */
-        .form-professor { background: #1a1a1a; margin: 40px; padding: 30px; border-radius: 8px; border: 1px dashed #444; text-align: center; }
-        input, select, textarea { width: 90%; padding: 10px; margin: 10px 0; background: #000; border: 1px solid #333; color: #fff; }
+        /* COFRE DE CHAVE (O segredo para o GitHub não matar) */
+        #cofre-setup { 
+            position: fixed; top:0; left:0; width:100%; height:100%; 
+            background: rgba(0,0,0,0.95); z-index: 9999; display: flex; 
+            flex-direction: column; align-items: center; justify-content: center;
+        }
 
-        /* AI Chat */
-        #ai-container { position: fixed; bottom: 20px; right: 20px; width: 320px; background: #111; border: 1px solid #444; border-radius: 8px; z-index: 1000; }
-        #ai-messages { height: 200px; overflow-y: auto; padding: 15px; font-size: 13px; background: #0d0d0d; }
-        .ai-input-area { display: flex; border-top: 1px solid #333; }
-        .ai-input-area input { flex: 1; background: #000; border: none; padding: 10px; color: #fff; }
+        /* VITRINE E SALA DE AULA */
+        header { padding: 40px; text-align: center; border-bottom: 1px solid #222; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 40px; }
+        .celta-card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 8px; text-align: center; }
+        
+        #sala-aula { display: none; padding: 30px; }
+        .layout { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .box { background: #161616; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        
+        button { background: var(--metal); border: none; padding: 12px; cursor: pointer; font-weight: bold; width: 100%; border-radius: 4px; }
+        input { width: 80%; padding: 12px; background: #000; border: 1px solid #444; color: white; margin-bottom: 10px; }
+        
+        #chat-msgs { height: 200px; overflow-y: auto; background: #000; padding: 10px; margin-bottom: 10px; font-size: 13px; }
     </style>
 </head>
 <body>
 
-    <header><h1>CELTA ACADEMY</h1></header>
+    <div id="cofre-setup">
+        <h2 style="color:var(--gold)">🔐 COFRE CELTA</h2>
+        <p>Insira sua Chave da IA (Hugging Face) para ativar os 17 cursos:</p>
+        <input type="password" id="input-key" placeholder="hf_xxxxxxxxxxxxxxxxx">
+        <button onclick="salvarChave()" style="width:200px;">ATIVAR SISTEMA</button>
+        <p style="font-size:10px; color:#555;">Sua chave fica salva apenas no seu navegador.</p>
+    </div>
 
-    <div class="grid-cursos" id="grid"></div>
+    <div id="home">
+        <header><h1>CELTA ACADEMY</h1><p>Mestre IA: Aulas, Exercícios e Vídeos</p></header>
+        <div class="grid" id="grid-cursos"></div>
+    </div>
 
-    <section class="form-professor">
-        <h2>SELETIVA DE MESTRES (50 VAGAS)</h2>
-        <p>Apenas os melhores profissionais serão aceitos. Candidate-se abaixo.</p>
-        <form action="https://formsubmit.co/SEU-EMAIL-AQUI@email.com" method="POST">
-            <input type="text" name="nome" placeholder="Seu Nome" required>
-            <select name="curso">
-                <option>Física Quântica</option><option>Decoração</option><option>Informática</option>
-                <option>Arquitetura</option><option>Línguas</option>
-            </select>
-            <textarea name="motivo" placeholder="Por que você deve ser um dos 50 mestres?"></textarea>
-            <button type="submit" class="btn-celta">ENVIAR CURRÍCULO</button>
-        </form>
-    </section>
-
-    <div id="ai-container">
-        <div style="padding:10px; background:#222; font-size:12px;">CELTA IA - MESTRE VIRTUAL</div>
-        <div id="ai-messages"></div>
-        <div class="ai-input-area">
-            <input type="text" id="ai-input" placeholder="Dúvida?">
-            <button onclick="perguntarIA()" style="background:#333; color:#fff; border:none; padding:10px;">></button>
+    <div id="sala-aula">
+        <button onclick="voltar()" style="width:100px; margin-bottom:20px;">← VOLTAR</button>
+        <div class="layout">
+            <div class="col-principal">
+                <div class="box">
+                    <h2 id="aula-titulo" style="color:var(--gold)"></h2>
+                    <div id="aula-texto">Aguardando mestre...</div>
+                </div>
+                <div class="box">
+                    <h3>📝 EXERCÍCIO DA IA</h3>
+                    <div id="aula-exercicio">O mestre está formulando as questões...</div>
+                </div>
+            </div>
+            <div class="col-lateral">
+                <div class="box">
+                    <h4>💬 CHAT COM A IA</h4>
+                    <div id="chat-msgs"></div>
+                    <input type="text" id="chat-input" placeholder="Tirar dúvida...">
+                    <button onclick="perguntarIA()">ENVIAR</button>
+                </div>
+                <div class="box">
+                    <h4>🎥 VÍDEO & PDF</h4>
+                    <div id="video-link"></div>
+                    <hr>
+                    <button onclick="window.print()" style="background:#222; color:#fff; border:1px solid #444;">📄 GERAR PDF DA AULA</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // TRUQUE PARA O GITHUB NÃO MATAR A IA: 
-        // Vamos remontar a chave em tempo de execução
-        const p1 = "hf_"; 
-        const p2 = "CYgMeN1tbZPF55mksVqor"; // Remonte sua chave aqui se ela foi deletada
-        const token = p1 + "LpZf" + "Swa" + "..." // O ideal é gerar um NOVO token na Hugging Face e colocar aqui picado
-        
-        // Se o GitHub deletou, vá na Hugging Face, gere outro e cole aqui:
-        const MINHA_CHAVE = "key_CYgMeN1tbZPF55mksVqor"; 
+        let CHAVE_MESTRA = localStorage.getItem('celta_key');
 
-        const cursos = ["Física Quântica", "Decoração", "Informática", "Arquitetura", "Física", "Matemática", "Inglês", "Latim", "Culinária"];
-        const grid = document.getElementById('grid');
+        // Verifica se já tem a chave salva
+        if(CHAVE_MESTRA) document.getElementById('cofre-setup').style.display = 'none';
+
+        function salvarChave() {
+            const k = document.getElementById('input-key').value;
+            if(k.includes('hf_')) {
+                localStorage.setItem('celta_key', k);
+                location.reload();
+            } else { alert("Chave inválida!"); }
+        }
+
+        const cursos = ["Física Quântica", "Decoração", "Informática", "Arquitetura", "Física", "Latim", "Culinária", "Inglês", "Geografia"];
+        const grid = document.getElementById('grid-cursos');
 
         cursos.forEach(c => {
-            grid.innerHTML += `<div class="celta-card"><div class="vagas-badge">VAGAS ABERTAS</div><h3>${c}</h3><button class="btn-celta" onclick="aula('${c}')">AULA IA</button></div>`;
+            grid.innerHTML += `<div class="celta-card"><h3>${c}</h3><button onclick="abrirAula('${c}')">ENTRAR NA AULA</button></div>`;
         });
 
-        async function aula(curso) {
-            document.getElementById('ai-messages').innerHTML = `<p>Iniciando aula de ${curso}...</p>`;
-            chamada(`Dê uma aula curta sobre ${curso}`);
+        function abrirAula(nome) {
+            document.getElementById('home').style.display = 'none';
+            document.getElementById('sala-aula').style.display = 'block';
+            document.getElementById('aula-titulo').innerText = nome;
+            document.getElementById('video-link').innerHTML = `<a href="https://www.youtube.com/results?search_query=aula+de+${nome}" target="_blank" style="color:red">Ver vídeos de ${nome}</a>`;
+            chamarIA(`Dê uma aula de ${nome} e crie 2 exercícios.`);
+        }
+
+        function voltar() { location.reload(); }
+
+        async function chamarIA(prompt) {
+            const aulaDiv = document.getElementById('aula-texto');
+            const exDiv = document.getElementById('aula-exercicio');
+            
+            try {
+                const r = await fetch("https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct", {
+                    headers: { "Authorization": `Bearer ${CHAVE_MESTRA}`, "Content-Type": "application/json" },
+                    method: "POST", body: JSON.stringify({ inputs: prompt }),
+                });
+                const d = await r.json();
+                const texto = d[0].generated_text.split(prompt).pop();
+                
+                aulaDiv.innerHTML = texto.split("Exercício")[0];
+                exDiv.innerHTML = texto.split("Exercício")[1] || "Leia a aula acima com atenção.";
+            } catch(e) { aulaDiv.innerHTML = "Erro! Sua chave expirou ou é inválida."; }
         }
 
         async function perguntarIA() {
-            const val = document.getElementById('ai-input').value;
-            document.getElementById('ai-messages').innerHTML += `<p><b>Você:</b> ${val}</p>`;
-            chamada(val);
-        }
-
-        async function chamada(p) {
-            try {
-                const r = await fetch("https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct", {
-                    headers: { Authorization: `Bearer ${MINHA_CHAVE}` },
-                    method: "POST", body: JSON.stringify({inputs: p}),
-                });
-                const d = await r.json();
-                document.getElementById('ai-messages').innerHTML += `<div><b>IA:</b> ${d[0].generated_text.split(p).pop()}</div>`;
-            } catch(e) { 
-                document.getElementById('ai-messages').innerHTML += `<p style="color:red">Chave bloqueada pelo GitHub. Gere uma nova na Hugging Face e "pique" o código dela.</p>`;
-            }
+            const inp = document.getElementById('chat-input');
+            const msgs = document.getElementById('chat-msgs');
+            msgs.innerHTML += `<div><b>Você:</b> ${inp.value}</div>`;
+            
+            const r = await fetch("https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct", {
+                headers: { "Authorization": `Bearer ${CHAVE_MESTRA}` },
+                method: "POST", body: JSON.stringify({ inputs: inp.value }),
+            });
+            const d = await r.json();
+            msgs.innerHTML += `<div style="color:var(--gold)"><b>IA:</b> ${d[0].generated_text.split(inp.value).pop()}</div>`;
+            inp.value = '';
+            msgs.scrollTop = msgs.scrollHeight;
         }
     </script>
 </body>
